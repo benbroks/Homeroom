@@ -110,7 +110,7 @@ public class excelTest {
 		while(j < studentData.size()){
 			if(!(studentData.get(j).getClassPref().equals("0"))){
 				int i = 0;
-				while (!((teacherData.get(i).equals(studentData.get(j).getGrade())) && (teacherData.get(i).getSubject().equals(studentData.get(j).getClassPref())))){
+				while (!((teacherData.get(i).getGrade().equals(studentData.get(j).getGrade())) && (teacherData.get(i).getSubject().equals(studentData.get(j).getClassPref())))){
 					i ++;
 					if (i == teacherData.size()){
 						break;
@@ -125,7 +125,59 @@ public class excelTest {
 			j ++;
 		}
 	}
+	
+	public static void avoidPlacement(ArrayList<Teacher> teacherData, ArrayList<Student> studentData){
+		int j = 0;
+		while (j < studentData.size()){
+			if(!(studentData.get(j).getNoNo().equals("0"))){
+				int i = 0;
+				while(i < teacherData.size()){
+					if(teacherData.get(i).getGrade().equals(studentData.get(j).getGrade())){
+						if(!(isStudent(teacherData.get(i), studentData.get(j).getNoNo()))){
+							break;
+						}
+					}
+					i ++;
+				}
+				if((i < teacherData.size())&&(teacherData.get(i).getNumStudents() < 25)){
+					teacherData.get(i).addStudent(studentData.get(j));
+					studentData.remove(j);
+					j --;
+				}
+			}
+			j ++;
+		}
+	}
 
+	public static void regularPlacement(ArrayList<Teacher> teacherData, ArrayList<Student> studentData){
+		int j = 0;
+		while (j < studentData.size()){
+			int i = 0;
+			while (i < teacherData.size()){
+				if(teacherData.get(i).getGrade().equals(studentData.get(j).getGrade())){
+					break;
+				}
+				i ++;
+			}
+			if((i < teacherData.size())&&(teacherData.get(i).getNumStudents() < 25)){
+				teacherData.get(i).addStudent(studentData.get(j));
+				studentData.remove(j);
+				j --;
+			}
+			j ++;
+		}
+	}
+	
+	public static boolean isStudent(Teacher t, String id){
+		for(int i = 0;i < t.getNumStudents();i++){
+			if(t.getStudents().get(i).getID().equals(id)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	
 	public static void main(String[] args) throws IOException {
 		String teachers = args[0];
 		String students = args[1];
@@ -277,6 +329,10 @@ public class excelTest {
 			}
 			
 		}
+		
+		avoidPlacement(teacherData, studentData);
+		classPlacement(teacherData, studentData);
+		regularPlacement(teacherData, studentData);
 		
 		//placing students by class preference
 		classPlacement(teacherData, studentData);
